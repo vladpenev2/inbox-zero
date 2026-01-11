@@ -1,0 +1,141 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "name": "Inbox Zero",
+  "description": "Self-hosted Inbox Zero - AI-powered email management",
+  "services": [
+    {
+      "name": "postgres",
+      "plugin": "postgresql",
+      "variables": {
+        "POSTGRES_DB": "inboxzero"
+      }
+    },
+    {
+      "name": "redis",
+      "plugin": "redis"
+    },
+    {
+      "name": "serverless-redis-http",
+      "image": "hiett/serverless-redis-http:latest",
+      "variables": {
+        "SRH_MODE": "env",
+        "SRH_TOKEN": "${{shared.UPSTASH_REDIS_TOKEN}}",
+        "SRH_CONNECTION_STRING": "${{redis.REDIS_URL}}"
+      }
+    },
+    {
+      "name": "web",
+      "image": "ghcr.io/elie222/inbox-zero:latest",
+      "variables": {
+        "DATABASE_URL": "${{postgres.DATABASE_URL}}",
+        "DIRECT_URL": "${{postgres.DATABASE_URL}}",
+        "UPSTASH_REDIS_URL": "http://${{serverless-redis-http.RAILWAY_PRIVATE_DOMAIN}}:80",
+        "UPSTASH_REDIS_TOKEN": "${{shared.UPSTASH_REDIS_TOKEN}}",
+        "REDIS_URL": "${{redis.REDIS_URL}}",
+        "NEXT_PUBLIC_BASE_URL": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+        "INTERNAL_API_URL": "http://${{RAILWAY_PRIVATE_DOMAIN}}:3000",
+        "AUTH_SECRET": "${{shared.AUTH_SECRET}}",
+        "EMAIL_ENCRYPT_SECRET": "${{shared.EMAIL_ENCRYPT_SECRET}}",
+        "EMAIL_ENCRYPT_SALT": "${{shared.EMAIL_ENCRYPT_SALT}}",
+        "INTERNAL_API_KEY": "${{shared.INTERNAL_API_KEY}}",
+        "API_KEY_SALT": "${{shared.API_KEY_SALT}}",
+        "CRON_SECRET": "${{shared.CRON_SECRET}}",
+        "GOOGLE_CLIENT_ID": "${{shared.GOOGLE_CLIENT_ID}}",
+        "GOOGLE_CLIENT_SECRET": "${{shared.GOOGLE_CLIENT_SECRET}}",
+        "GOOGLE_PUBSUB_TOPIC_NAME": "${{shared.GOOGLE_PUBSUB_TOPIC_NAME}}",
+        "GOOGLE_PUBSUB_VERIFICATION_TOKEN": "${{shared.GOOGLE_PUBSUB_VERIFICATION_TOKEN}}",
+        "NEXT_PUBLIC_BYPASS_PREMIUM_CHECKS": "true",
+        "NEXT_PUBLIC_EMAIL_SEND_ENABLED": "true",
+        "DEFAULT_LLM_PROVIDER": "${{shared.DEFAULT_LLM_PROVIDER}}",
+        "DEFAULT_LLM_MODEL": "${{shared.DEFAULT_LLM_MODEL}}",
+        "ECONOMY_LLM_PROVIDER": "${{shared.ECONOMY_LLM_PROVIDER}}",
+        "ECONOMY_LLM_MODEL": "${{shared.ECONOMY_LLM_MODEL}}",
+        "OPENAI_API_KEY": "${{shared.OPENAI_API_KEY}}",
+        "ANTHROPIC_API_KEY": "${{shared.ANTHROPIC_API_KEY}}"
+      },
+      "healthcheck": {
+        "path": "/api/health",
+        "timeout": 300
+      }
+    },
+    {
+      "name": "cron",
+      "image": "alpine:latest",
+      "startCommand": "sh -c \"apk add --no-cache curl && WATCH_INTERVAL=21600 && MEETING_BRIEFS_INTERVAL=900 && LAST_WATCH=0 && while true; do NOW=$(date +%s); echo '[cron] Processing meeting briefs...'; curl -s -X GET \\\"http://$WEB_HOST:3000/api/meeting-briefs\\\" -H \\\"Authorization: Bearer $CRON_SECRET\\\" || echo '[cron] Warning: meeting-briefs request failed'; if [ $((NOW - LAST_WATCH)) -ge $WATCH_INTERVAL ]; then echo '[cron] Renewing email watches...'; curl -s -X GET \\\"http://$WEB_HOST:3000/api/watch/all\\\" -H \\\"Authorization: Bearer $CRON_SECRET\\\" || echo '[cron] Warning: watch request failed'; LAST_WATCH=$NOW; fi; echo '[cron] Sleeping for 15 minutes...'; sleep $MEETING_BRIEFS_INTERVAL; done\"",
+      "variables": {
+        "CRON_SECRET": "${{shared.CRON_SECRET}}",
+        "WEB_HOST": "${{web.RAILWAY_PRIVATE_DOMAIN}}"
+      }
+    }
+  ],
+  "variables": {
+    "AUTH_SECRET": {
+      "description": "Authentication secret (auto-generated)",
+      "default": "853578da0471408f2031c8fd1744a84efaa4867a9f61bed21eb84f4458ad56b7"
+    },
+    "EMAIL_ENCRYPT_SECRET": {
+      "description": "Email encryption secret (auto-generated)",
+      "default": "74b38d0eefd593e9963c675e6590504f3a7c3489459f432ada9f5748506728bb"
+    },
+    "EMAIL_ENCRYPT_SALT": {
+      "description": "Email encryption salt (auto-generated)",
+      "default": "89808391a9eb3f6dc868ad93761f801c"
+    },
+    "INTERNAL_API_KEY": {
+      "description": "Internal API key (auto-generated)",
+      "default": "4683355c10b47da55b85936c8a4935edd8d385148d247e5bec21e9466efbdedd"
+    },
+    "API_KEY_SALT": {
+      "description": "API key salt (auto-generated)",
+      "default": "4d47c1576790eb73dbaee7fd7b296f3fe1651d5333b5e10d13e2ad26a8610699"
+    },
+    "CRON_SECRET": {
+      "description": "Cron job secret (auto-generated)",
+      "default": "04c0c5b6f2be03c59861b5f536df1e60df917338bb521ffffe45d4fd4593a4fe"
+    },
+    "UPSTASH_REDIS_TOKEN": {
+      "description": "Redis HTTP token (auto-generated)",
+      "default": "4621e13e89fe3be0de5c122246170b6c4c851caa70bf5a2536405ae85c6a4e55"
+    },
+    "GOOGLE_PUBSUB_VERIFICATION_TOKEN": {
+      "description": "Google PubSub verification token (auto-generated)",
+      "default": "81aa142a7aaa7f4fa9db45b9403b459b9707932fb270006e45b2ad9a7a17007a"
+    },
+    "GOOGLE_CLIENT_ID": {
+      "description": "Google OAuth Client ID (required)",
+      "required": true
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "description": "Google OAuth Client Secret (required)",
+      "required": true
+    },
+    "GOOGLE_PUBSUB_TOPIC_NAME": {
+      "description": "Google PubSub topic (e.g., projects/your-project/topics/inbox-zero)",
+      "required": true
+    },
+    "DEFAULT_LLM_PROVIDER": {
+      "description": "LLM provider: openai, anthropic, google, etc.",
+      "default": "openai"
+    },
+    "DEFAULT_LLM_MODEL": {
+      "description": "Default LLM model",
+      "default": "gpt-4o"
+    },
+    "ECONOMY_LLM_PROVIDER": {
+      "description": "Economy LLM provider",
+      "default": "openai"
+    },
+    "ECONOMY_LLM_MODEL": {
+      "description": "Economy LLM model (for cheaper operations)",
+      "default": "gpt-4o-mini"
+    },
+    "OPENAI_API_KEY": {
+      "description": "OpenAI API key (if using OpenAI)",
+      "required": false
+    },
+    "ANTHROPIC_API_KEY": {
+      "description": "Anthropic API key (if using Anthropic)",
+      "required": false
+    }
+  }
+}

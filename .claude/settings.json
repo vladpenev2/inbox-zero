@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"\nconst { Client } = require\\(''pg''\\);\nconst client = new Client\\({\n  connectionString: ''postgresql://postgres:VovsUEStWcXfVEcHPMOQHAjjrxQJTSuE@switchyard.proxy.rlwy.net:41999/railway''\n}\\);\nclient.connect\\(\\).then\\(\\(\\) => {\n  return client.query\\(''SELECT id, email, \"\"premiumId\"\" FROM \"\"User\"\"''\\);\n}\\).then\\(res => {\n  console.log\\(JSON.stringify\\(res.rows, null, 2\\)\\);\n  client.end\\(\\);\n}\\).catch\\(err => {\n  console.error\\(err\\);\n  client.end\\(\\);\n}\\);\n\")"
+    ]
+  }
+}
