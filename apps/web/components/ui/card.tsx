@@ -98,7 +98,7 @@ const CardGreen = React.forwardRef<
   <Card
     ref={ref}
     className={cn(
-      "border-green-100 bg-gradient-to-tr from-transparent via-green-50/80 to-green-500/15 dark:border-green-900 dark:from-green-950/50 dark:via-green-900/20 dark:to-green-800/10",
+      "border-success/20 bg-gradient-to-tr from-transparent via-success-muted/80 to-success/15",
       className,
     )}
     {...props}
@@ -113,7 +113,7 @@ const CardBlue = React.forwardRef<
   <Card
     ref={ref}
     className={cn(
-      "border-blue-100 bg-gradient-to-tr from-transparent via-blue-50/80 to-blue-500/15 dark:border-blue-900 dark:from-blue-950/50 dark:via-blue-900/20 dark:to-blue-800/10",
+      "border-info/20 bg-gradient-to-tr from-transparent via-info-muted/80 to-info/15",
       className,
     )}
     {...props}
@@ -128,7 +128,7 @@ const CardRed = React.forwardRef<
   <Card
     ref={ref}
     className={cn(
-      "border-red-100 bg-gradient-to-tr from-transparent via-red-50/80 to-red-500/15 dark:border-red-900 dark:from-red-950/50 dark:via-red-900/20 dark:to-red-800/10",
+      "border-error/20 bg-gradient-to-tr from-transparent via-error-muted/80 to-error/15",
       className,
     )}
     {...props}
@@ -166,10 +166,10 @@ const ActionCard = React.forwardRef<
           : CardGreen;
     const iconColor =
       variant === "blue"
-        ? "text-blue-600 dark:text-blue-400"
+        ? "text-info"
         : variant === "destructive"
-          ? "text-red-600 dark:text-red-400"
-          : "text-green-600 dark:text-green-400";
+          ? "text-error"
+          : "text-success";
 
     return (
       <CardVariant ref={ref} className={cn("max-w-2xl", className)} {...props}>
