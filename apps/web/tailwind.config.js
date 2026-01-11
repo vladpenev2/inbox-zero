@@ -93,6 +93,27 @@ module.exports = {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        // Semantic colors
+        success: {
+          DEFAULT: "var(--success)",
+          foreground: "var(--success-foreground)",
+          muted: "var(--success-muted)",
+        },
+        warning: {
+          DEFAULT: "var(--warning)",
+          foreground: "var(--warning-foreground)",
+          muted: "var(--warning-muted)",
+        },
+        info: {
+          DEFAULT: "var(--info)",
+          foreground: "var(--info-foreground)",
+          muted: "var(--info-muted)",
+        },
+        error: {
+          DEFAULT: "var(--error)",
+          foreground: "var(--error-foreground)",
+          muted: "var(--error-muted)",
+        },
         // TODO: rename
         new: {
           purple: {
