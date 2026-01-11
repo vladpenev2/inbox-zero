@@ -3,7 +3,8 @@ builder = "dockerfile"
 dockerfilePath = "docker/Dockerfile.prod"
 
 [deploy]
-healthcheckPath = "/api/health"
+# Removed healthcheckPath - the /api/health endpoint requires HEALTH_API_KEY header
+# which Railway's built-in healthcheck doesn't support
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
