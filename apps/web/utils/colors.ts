@@ -24,10 +24,11 @@ export function getRandomColor() {
 
 export const COLORS = {
   analytics: {
-    blue: "#006EFF80",
-    purple: "#6410FF80",
-    pink: "#C942B2",
-    lightPink: "#C942B260",
+    // Using theme-aligned colors (orange/warm tones for primary)
+    blue: "#D9742080", // Changed from blue to warm orange (primary)
+    purple: "#A0522D80", // Sienna brown
+    pink: "#CD853F", // Peru/tan
+    lightPink: "#CD853F60",
     green: "#17A34A",
     lightGreen: "#17A34A60",
   },
